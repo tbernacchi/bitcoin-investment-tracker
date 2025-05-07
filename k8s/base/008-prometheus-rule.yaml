@@ -1,0 +1,43 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: bitcoin-investment-alerts
+  namespace: bitcoin-investment-tracker
+  labels:
+    release: my-kube-prometheus-stack #label of the prometheus stack.
+spec:
+  groups:
+    - name: bitcoin.rules
+      rules:
+        - alert: BitcoinPriceIncrease2Percent
+          expr: (bitcoin_current_price_brl / bitcoin_current_price_brl offset 5m - 1) * 100 > 2
+          for: 1m
+          labels:
+            severity: info
+            channel: slack
+          annotations:
+            summary: "📈 Alta no Bitcoin 📈"
+            description: |
+              🚀 Price increase!
+              The price of Bitcoin has increased by more than 2% in the last 5 minutes!
+              Current price: R$ {{ $value }}
+              Current profit: {{ with query "bitcoin_investment_profit_percent" }}{{ . | first | value }}%{{ end }}
+
+              Sent via Bitcoin Investment Tracker
+
+        - alert: BitcoinPriceDecrease2Percent
+          expr: (bitcoin_current_price_brl / bitcoin_current_price_brl offset 5m - 1) * 100 < -2
+          for: 1m
+          labels:
+            severity: info
+            channel: slack
+          annotations:
+            summary: "📉 Bitcoin price decrease 📉"
+            description: |
+              ⚠️ QUEDA RÁPIDA!
+              The price of Bitcoin has decreased by more than 2% in the last 5 minutes!
+              Current price: R$ {{ $value }}
+              Current profit: {{ with query "bitcoin_investment_profit_percent" }}{{ . | first | value }}%{{ end }}
+
+              Sent via Bitcoin Investment Tracker

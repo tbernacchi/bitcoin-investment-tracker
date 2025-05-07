@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bitcoin-tracker-config
+  namespace: bitcoin-investment-tracker
+data:
+  MERCADO_BITCOIN_API_URL: "https://www.mercadobitcoin.net/api/BTC/ticker/"
+  BINANCE_USDT_API_URL: "https://api.binance.com/api/v3/ticker/price?symbol=USDTBRL"
+  CHECK_INTERVAL: "1s"

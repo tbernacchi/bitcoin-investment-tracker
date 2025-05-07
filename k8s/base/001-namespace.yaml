@@ -1,0 +1,7 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bitcoin-investment-tracker
+  labels:
+    name: bitcoin-investment-tracker

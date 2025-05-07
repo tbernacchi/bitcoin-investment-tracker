@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bitcoin-investment-tracker
+  namespace: bitcoin-investment-tracker
+  labels:
+    app: bitcoin-investment-tracker  # Add this label - servicemonitor
+    app.kubernetes.io/environment: base
+    app.kubernetes.io/instance: bitcoin-investment-tracker
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/part-of: bitcoin-investment-tracker
+spec:
+  selector:
+    app: bitcoin-investment-tracker
+  ports:
+  - name: bitcoin-investment-tracker 
+    port: 80
+    targetPort: 8080
+  - name: metrics
+    port: 2112
+    targetPort: 2112
+  type: ClusterIP

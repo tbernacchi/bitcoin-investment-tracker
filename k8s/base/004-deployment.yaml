@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bitcoin-investment-tracker
+  namespace: bitcoin-investment-tracker
+  labels:
+    app: bitcoin-investment-tracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bitcoin-investment-tracker
+  template:
+    metadata:
+      labels:
+        app: bitcoin-investment-tracker
+    spec:
+      containers:
+      - name: bitcoin-investment-tracker
+        image: ambrosiaaaaa/bitcoin-investment-tracker:v0.0.3
+        ports:
+        - name: bitcoin-tracker
+          containerPort: 8080
+        - name: metrics
+          containerPort: 2112
+        envFrom:
+        - configMapRef:
+            name: bitcoin-tracker-config
+        - secretRef:
+            name: bitcoin-tracker-secret
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"

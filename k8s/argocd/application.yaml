@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bitcoin-investment-tracker
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/git-branch: "main"
+    argocd-image-updater.argoproj.io/image-list: "myalias=ambrosiaaaaa/bitcoin-investment-tracker"
+    argocd-image-updater.argoproj.io/myalias.pull-secret: "dockerhub-secret"
+    argocd-image-updater.argoproj.io/myalias.update-strategy: "semver"
+    argocd-image-updater.argoproj.io/write-back-method: "git:secret:argocd/git-creds"
+    argocd-image-updater.argoproj.io/write-back-target: "kustomization"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/tbernacchi/bitcoin-investment-tracker.git
+    targetRevision: HEAD
+    path: k8s/base
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: bitcoin-investment-tracker
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - Validate=false

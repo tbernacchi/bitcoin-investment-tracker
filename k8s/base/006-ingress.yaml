@@ -1,0 +1,28 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-bitcoin-prefix
+  namespace: bitcoin-investment-tracker
+spec:
+  stripPrefix:
+    prefixes:
+      - /bitcoin
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: bitcoin-investment-tracker
+  namespace: bitcoin-investment-tracker
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: |
+        Host(`traefik.mykubernetes.com`) && PathPrefix(`/bitcoin`)
+      middlewares:
+        - name: strip-bitcoin-prefix
+      services:
+        - name: bitcoin-investment-tracker
+          port: 80
+  tls: {}  # Wildcard/default certificate

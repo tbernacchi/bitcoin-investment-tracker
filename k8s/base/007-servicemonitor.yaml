@@ -1,0 +1,18 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: bitcoin-tracker
+  namespace: bitcoin-investment-tracker
+  labels:
+    release: my-kube-prometheus-stack  # important: same label as your prometheus-operator
+spec:
+  selector:
+    matchLabels:
+      app: bitcoin-investment-tracker
+  namespaceSelector:
+    matchNames:
+      - bitcoin-investment-tracker
+  endpoints:
+  - port: metrics
+    interval: 30s
