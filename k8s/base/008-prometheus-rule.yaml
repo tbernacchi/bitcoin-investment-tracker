@@ -10,33 +10,33 @@ spec:
   groups:
     - name: bitcoin.rules
       rules:
-        - alert: BitcoinPriceIncrease2Percent
-          expr: (bitcoin_current_price_brl / bitcoin_current_price_brl offset 5m - 1) * 100 > 2
+        - alert: BitcoinPriceDrop3Percent
+          expr: bitcoin_price_change_percent < -3
           for: 1m
           labels:
-            severity: info
+            severity: warning
             channel: slack
           annotations:
-            summary: "📈 Alta no Bitcoin 📈"
+            summary: "🔻 Bitcoin price decrease 🔻"
             description: |
-              🚀 Price increase!
-              The price of Bitcoin has increased by more than 2% in the last 5 minutes!
+              🚀 Price decrease!
+              The price of Bitcoin has decreased by more than 3% in the last 1 minute!
               Current price: R$ {{ $value }}
               Current profit: {{ with query "bitcoin_investment_profit_percent" }}{{ . | first | value }}%{{ end }}
 
               Sent via Bitcoin Investment Tracker
 
-        - alert: BitcoinPriceDecrease2Percent
-          expr: (bitcoin_current_price_brl / bitcoin_current_price_brl offset 5m - 1) * 100 < -2
+        - alert: BitcoinPriceIncrease3Percent
+          expr: bitcoin_price_change_percent > 3
           for: 1m
           labels:
-            severity: info
+            severity: warning
             channel: slack
           annotations:
-            summary: "📉 Bitcoin price decrease 📉"
+            summary: "📉 Bitcoin price increase 📉"
             description: |
-              ⚠️ QUEDA RÁPIDA!
-              The price of Bitcoin has decreased by more than 2% in the last 5 minutes!
+              ⚠️ Price increase!
+              The price of Bitcoin has increased by more than 3% in the last 1 minute!
               Current price: R$ {{ $value }}
               Current profit: {{ with query "bitcoin_investment_profit_percent" }}{{ . | first | value }}%{{ end }}
 
