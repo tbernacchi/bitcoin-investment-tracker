@@ -11,7 +11,7 @@ resources:
   - 007-servicemonitor.yaml
 images:
   - name: ambrosiaaaaa/bitcoin-investment-tracker
-    newTag: v0.0.5
+    newTag: v0.0.6
 # Common labels for all resources
 commonLabels:
   app.kubernetes.io/managed-by: argocd
