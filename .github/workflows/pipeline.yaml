@@ -15,7 +15,7 @@ env:
 
 jobs:
   test:
-    runs-on: [my-runner-bitcoin-investment-tracker]
+    runs-on: [my-bitcoin-investment-tracker]
 
     steps:
       # Checkout code
