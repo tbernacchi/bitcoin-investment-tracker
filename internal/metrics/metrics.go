@@ -26,21 +26,25 @@ var (
 		Name: "bitcoin_current_price_brl",
 		Help: "Current Bitcoin price in BRL",
 	})
+
+	bitcoinPriceChangePercent = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "bitcoin_price_change_percent",
+		Help: "Current price change percentage",
+	})
 )
 
-// UpdateMetrics updates all investment metrics
-func UpdateMetrics(initialInvestment, currentValue, btcAmount, btcPrice float64) {
-	// Investment values
-	bitcoinInvestmentValue.WithLabelValues("initial").Set(initialInvestment)
-	bitcoinInvestmentValue.WithLabelValues("current").Set(currentValue)
+// UpdateMetrics atualiza todas as métricas
+func UpdateMetrics(price float64, changePercent float64) {
+	bitcoinPrice.Set(price)
+	bitcoinPriceChangePercent.Set(changePercent)
 
-	// Calculate and update the profit/loss percentage
+	// Calcular outras métricas
+	initialInvestment := 1000.0 // Valor inicial do investimento em BRL
+	btcAmount := 0.0123         // Quantidade de BTC
+	currentValue := btcAmount * price
 	profitPercent := ((currentValue - initialInvestment) / initialInvestment) * 100
-	bitcoinProfitPercent.Set(profitPercent)
 
-	// Bitcoin amount
 	bitcoinAmount.Set(btcAmount)
-
-	// Current Bitcoin price
-	bitcoinPrice.Set(btcPrice)
+	bitcoinInvestmentValue.WithLabelValues("current").Set(currentValue)
+	bitcoinProfitPercent.Set(profitPercent)
 }

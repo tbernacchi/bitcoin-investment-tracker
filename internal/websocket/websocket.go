@@ -61,7 +61,7 @@ func formatPrice(price float64) string {
 }
 
 // MonitorPrices establishes a WebSocket connection to Binance
-func MonitorPrices(wsURL string, priceCallback func(float64)) {
+func MonitorPrices(wsURL string, priceCallback func(float64, float64)) {
 	log.Printf("Connecting to Binance WebSocket...")
 
 	c, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
@@ -111,6 +111,6 @@ func MonitorPrices(wsURL string, priceCallback func(float64)) {
 		}
 
 		log.Printf("BTC Price: %s (%s%.2f%%)", formatPrice(price), changeSymbol, changePercent)
-		priceCallback(price)
+		priceCallback(price, changePercent)
 	}
 }
