@@ -20,4 +20,4 @@ spec:
       channel: 'bitcoin-investment-tracker'
       apiURL:
         name: slack-token
-        key: url
+        key: token
