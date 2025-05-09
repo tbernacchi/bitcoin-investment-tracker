@@ -7,6 +7,8 @@ metadata:
   labels:
     release: my-kube-prometheus-stack
 spec:
+  global:
+    slackAPIURL: "https://slack.com/api/chat.postMessage"
   route:
     receiver: slack-bitcoin
     groupBy: ['alertname']
