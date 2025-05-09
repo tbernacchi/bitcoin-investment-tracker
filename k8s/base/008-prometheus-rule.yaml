@@ -15,7 +15,7 @@ spec:
           for: 1m
           labels:
             severity: warning
-            channel: slack
+            receiver: slack-bitcoin
           annotations:
             summary: "🔻 Bitcoin price decrease 🔻"
             description: |
@@ -31,7 +31,7 @@ spec:
           for: 1m
           labels:
             severity: warning
-            channel: slack
+            receiver: slack-bitcoin
           annotations:
             summary: "📉 Bitcoin price increase 📉"
             description: |
