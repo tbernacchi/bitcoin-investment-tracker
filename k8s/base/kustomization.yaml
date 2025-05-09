@@ -14,7 +14,7 @@ resources:
   - 010-prometheus-patch.yaml
 images:
   - name: ambrosiaaaaa/bitcoin-investment-tracker
-    newTag: v0.0.8
+    newTag: v0.0.9
 # Common labels for all resources
 commonLabels:
   app.kubernetes.io/managed-by: argocd
