@@ -19,5 +19,5 @@ spec:
     - sendResolved: true
       channel: 'bitcoin-investment-tracker'
       apiURL:
-        name: slack-webhook-url
+        name: slack-token
         key: url
