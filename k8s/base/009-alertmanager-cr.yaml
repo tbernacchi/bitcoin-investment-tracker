@@ -21,4 +21,5 @@ spec:
       token:
         name: slack-token
         key: token
-      apiURL: "https://slack.com/api/chat.postMessage"
+      apiURL:
+        url: "https://slack.com/api/chat.postMessage"
