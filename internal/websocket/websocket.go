@@ -6,6 +6,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -62,55 +63,66 @@ func formatPrice(price float64) string {
 
 // MonitorPrices establishes a WebSocket connection to Binance
 func MonitorPrices(wsURL string, priceCallback func(float64, float64)) {
-	log.Printf("Connecting to Binance WebSocket...")
-
-	c, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
-	if err != nil {
-		log.Fatal("WebSocket connection failed:", err)
-	}
-	defer c.Close()
-
-	log.Printf("Successfully connected to Binance WebSocket")
+	log.Printf("Starting Binance WebSocket monitor...")
 
 	for {
-		_, message, err := c.ReadMessage()
+		// Try to connect to Binance WebSocket
+		log.Printf("Connecting to Binance WebSocket...")
+		c, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
 		if err != nil {
-			log.Println("WebSocket read error:", err)
-			return
-		}
-
-		var ticker BinanceTickerMessage
-		if err := json.Unmarshal(message, &ticker); err != nil {
-			log.Println("JSON parsing error:", err)
-			log.Printf("Received message: %s", string(message))
+			log.Printf("WebSocket connection failed: %v", err)
+			log.Printf("Retrying in 5 seconds...")
+			time.Sleep(5 * time.Second)
 			continue
 		}
+		log.Printf("Successfully connected to Binance WebSocket")
 
-		// Convert string price to float64
-		price, err := strconv.ParseFloat(ticker.LastPrice, 64)
-		if err != nil {
-			log.Println("Price conversion error:", err)
-			continue
+		// Read loop
+		for {
+			_, message, err := c.ReadMessage()
+			if err != nil {
+				log.Printf("WebSocket read error: %v", err)
+				c.Close()
+				log.Printf("Reconnecting in 5 seconds...")
+				break // Exit the inner loop to reconnect
+			}
+
+			var ticker BinanceTickerMessage
+			if err := json.Unmarshal(message, &ticker); err != nil {
+				log.Println("JSON parsing error:", err)
+				log.Printf("Received message: %s", string(message))
+				continue
+			}
+
+			// Convert string price to float64
+			price, err := strconv.ParseFloat(ticker.LastPrice, 64)
+			if err != nil {
+				log.Println("Price conversion error:", err)
+				continue
+			}
+
+			// Get 24h price change percentage
+			changePercent, err := strconv.ParseFloat(ticker.PricePercent, 64)
+			if err != nil {
+				log.Println("Change percent conversion error:", err)
+				continue
+			}
+
+			// Format the log message with price and change percentage
+			var changeSymbol string
+			if changePercent > 0 {
+				changeSymbol = "↑"
+			} else if changePercent < 0 {
+				changeSymbol = "↓"
+			} else {
+				changeSymbol = "="
+			}
+
+			log.Printf("BTC Price: %s (%s%.2f%%)", formatPrice(price), changeSymbol, changePercent)
+			priceCallback(price, changePercent)
 		}
 
-		// Get 24h price change percentage
-		changePercent, err := strconv.ParseFloat(ticker.PricePercent, 64)
-		if err != nil {
-			log.Println("Change percent conversion error:", err)
-			continue
-		}
-
-		// Format the log message with price and change percentage
-		var changeSymbol string
-		if changePercent > 0 {
-			changeSymbol = "↑" // up arrow for positive change
-		} else if changePercent < 0 {
-			changeSymbol = "↓" // down arrow for negative change
-		} else {
-			changeSymbol = "=" // equals for no change
-		}
-
-		log.Printf("BTC Price: %s (%s%.2f%%)", formatPrice(price), changeSymbol, changePercent)
-		priceCallback(price, changePercent)
+		// Try to reconnect 5 seconds after the connection is lost
+		time.Sleep(5 * time.Second)
 	}
 }

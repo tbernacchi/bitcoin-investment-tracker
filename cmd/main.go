@@ -12,34 +12,34 @@ import (
 )
 
 func main() {
-	// Carregar variáveis do .env
+	// Load environment variables
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
 	log.Printf("Bitcoin price monitor started")
 
-	// URL do websocket da Binance
+	// Binance websocket URL
 	binanceWsURL := "wss://stream.binance.com/ws/btcbrl@ticker"
 
-	// Iniciar servidor web
+	// Start web server
 	go webserver.StartWebServer()
 
-	// Configurar endpoint de métricas
+	// Configure metrics endpoint
 	http.Handle("/metrics", promhttp.Handler())
 
-	// Iniciar servidor de métricas na porta 2112
+	// Start metrics server on port 2112
 	go func() {
 		log.Printf("Starting metrics server on :2112")
 		log.Fatal(http.ListenAndServe(":2112", nil))
 	}()
 
-	// Iniciar WebSocket para métricas
+	// Start WebSocket for metrics
 	go websocket.MonitorPrices(
 		binanceWsURL,
 		metrics.UpdateMetrics,
 	)
 
-	// Manter o programa rodando
+	// Keep the program running
 	select {}
 }
