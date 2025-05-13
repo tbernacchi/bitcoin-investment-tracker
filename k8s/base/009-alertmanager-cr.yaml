@@ -1,29 +1,27 @@
+---
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: AlertmanagerConfig
 metadata:
   name: bitcoin-alertmanager-config
   namespace: bitcoin-investment-tracker
   labels:
-    app.kubernetes.io/environment: base
-    app.kubernetes.io/instance: bitcoin-investment-tracker
-    app.kubernetes.io/managed-by: argocd
-    app.kubernetes.io/part-of: bitcoin-investment-tracker
     release: my-kube-prometheus-stack
 spec:
-  receivers:
-    - name: slack-bitcoin
-      slackConfigs:
-        - channel: '#bitcoin-investment-tracker'
-          apiURL: https://slack.com/api/chat.postMessage
-          httpConfig:
-            authorization:
-              credentials:
-                name: slack-token
-                key: token
-          sendResolved: true
   route:
+    receiver: slack-bitcoin
     groupBy: ['alertname']
     groupWait: 10s
     groupInterval: 5m
-    repeatInterval: 3m
-    receiver: slack-bitcoin
+    repeatInterval: 3h
+  receivers:
+  - name: slack-bitcoin
+    slackConfigs:
+    - sendResolved: true
+      channel: '#bitcoin-investment-tracker'
+      apiURL:
+        name: slack-token
+        key: token
+      httpConfig:
+        bearerTokenSecret:
+          name: slack-token
+          key: token
