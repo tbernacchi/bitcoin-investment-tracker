@@ -18,6 +18,7 @@ spec:
     slackConfigs:
     - sendResolved: true
       channel: '#bitcoin-investment-tracker'
+      api_url: https://slack.com/api/chat.postMessage
       token:
         name: slack-token
         key: token
