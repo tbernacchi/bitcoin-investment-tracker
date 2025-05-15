@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: test-bitcoin-alert
+  namespace: bitcoin-investment-tracker
+  labels:
+    release: my-kube-prometheus-stack
+spec:
+  groups:
+  - name: test-bitcoin.rules
+    rules:
+    - alert: TestBitcoinPriceDrop
+      expr: vector(1)  # Isso vai sempre disparar a alerta
+      for: 10s
+      labels:
+        severity: warning
+        namespace: monitoring
+        receiver: slack-bitcoin
+      annotations:
+        summary: "🔻 Test Bitcoin Alert 🔻"
+        description: "Isso é um teste simples que deve sempre disparar"

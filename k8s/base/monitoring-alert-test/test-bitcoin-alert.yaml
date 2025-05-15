@@ -1,0 +1,36 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: test-bitcoin-alertmanager
+  namespace: monitoring
+  labels:
+    release: my-kube-prometheus-stack
+spec:
+  route:
+    receiver: test-slack-bitcoin
+    matchers:
+      - name: alertname
+        value: TestBitcoinPriceDrop
+        matchType: "="
+    groupBy: ['alertname']
+    groupWait: 0s       # Sem espera para testes
+    groupInterval: 1m   # Intervalo curto para testes
+    repeatInterval: 1m  # Repetição frequente para testes
+  receivers:
+  - name: test-slack-bitcoin
+    slackConfigs:
+    - sendResolved: true
+      channel: '#bitcoin-investment-tracker'
+      apiURL:
+        name: slack-token
+        key: url
+      httpConfig:
+        bearerTokenSecret:
+          name: slack-token
+          key: token
+      title: '{{ .CommonLabels.alertname }}'
+      text: |-
+        *Alert:* {{ .CommonLabels.alertname }}
+        *Status:* {{ .Status }}
+        *Description:* {{ .CommonAnnotations.description }}
+        *Severity:* {{ .CommonLabels.severity }}
