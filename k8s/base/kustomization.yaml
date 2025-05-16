@@ -9,8 +9,6 @@ resources:
   - 005-service.yaml
   - 006-ingress.yaml
   - 007-servicemonitor.yaml
-  - 008-prometheus-rule.yaml
-  - 009-alertmanager-cr.yaml
 images:
   - name: ambrosiaaaaa/bitcoin-investment-tracker
     newTag: v0.0.9
