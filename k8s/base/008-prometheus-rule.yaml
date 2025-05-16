@@ -9,8 +9,20 @@ metadata:
 spec:
   groups:
     - name: bitcoin.rules
-      interval: 1m  # Temporarily reduced for testing
+      interval: 15m
       rules:
+        - alert: BitcoinPriceVariation
+          expr: bitcoin_price_change_percent > 0
+          for: 1m
+          labels:
+            severity: info
+            namespace: monitoring
+          annotations:
+            summary: "🚨 Bitcoin Price Update 🚨"
+            description: |
+              Price change: {{ $value | printf "%.2f" }}%
+              Current price: $ {{ with query "bitcoin_current_price_usd" }}{{ . | first | value | printf "%.2f" }}{{ end }}
+
         # Test alert for small changes
         - alert: BitcoinProfitTarget
           expr: bitcoin_price_change_percent >= 0.5  # Simplified expression for testing
