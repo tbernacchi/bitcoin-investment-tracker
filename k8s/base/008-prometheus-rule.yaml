@@ -11,7 +11,7 @@ spec:
     - name: bitcoin.rules
       rules:
         - alert: BitcoinPriceDrop3Percent
-          expr: bitcoin_price_change_percent > 0.5
+          expr: "bitcoin_price_change_percent > 0.5"
           for: 1m
           labels:
             severity: warning
