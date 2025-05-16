@@ -2,17 +2,21 @@
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: AlertmanagerConfig
 metadata:
-  name: bitcoin-alertmanager-config
-  namespace: bitcoin-investment-tracker
+  name: bitcoin-alertmanager
+  namespace: monitoring
   labels:
     release: my-kube-prometheus-stack
 spec:
   route:
     receiver: slack-bitcoin
+    matchers:
+      - name: alertname
+        value: BitcoinProfitTarget.*|BitcoinLossAlert.*
+        matchType: "=~"
     groupBy: ['alertname']
-    groupWait: 10s
-    groupInterval: 5m
-    repeatInterval: 3h
+    groupWait: 30s
+    groupInterval: 15m    # Will check every 15 minutes
+    repeatInterval: 15m   # Will alert again if still at new level
   receivers:
   - name: slack-bitcoin
     slackConfigs:
@@ -20,8 +24,10 @@ spec:
       channel: '#bitcoin-investment-tracker'
       apiURL:
         name: slack-token
-        key: token
+        key: url
       httpConfig:
         bearerTokenSecret:
           name: slack-token
           key: token
+      title: '{{ .CommonAnnotations.summary }}'
+      text: '{{ .CommonAnnotations.description }}'
