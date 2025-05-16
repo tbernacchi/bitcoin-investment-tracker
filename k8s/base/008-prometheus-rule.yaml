@@ -2,125 +2,26 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: bitcoin-alert
+  name: bitcoin-investment-alerts
   namespace: bitcoin-investment-tracker
   labels:
-    release: my-kube-prometheus-stack
+    release: my-kube-prometheus-stack #label of the prometheus stack.
 spec:
   groups:
     - name: bitcoin.rules
-      interval: 15m
       rules:
-        - alert: BitcoinPriceVariation
-          expr: bitcoin_price_change_percent > 0
-          for: 1m
-          labels:
-            severity: info
-            namespace: monitoring
-          annotations:
-            summary: "🚨 Bitcoin Price Update 🚨"
-            description: |
-              Price change: {{ $value | printf "%.2f" }}%
-              Current price: $ {{ with query "bitcoin_current_price_usd" }}{{ . | first | value | printf "%.2f" }}{{ end }}
-
-        # Test alert for small changes
-        - alert: BitcoinProfitTarget
-          expr: bitcoin_price_change_percent >= 0.5  # Simplified expression for testing
-          for: 30s
-          labels:
-            severity: info
-            namespace: monitoring
-          annotations:
-            summary: "🚨 Test Alert 🚨"
-            description: |
-              🎉 TEST ALERT!
-              Price change detected: {{ $value | printf "%.2f" }}%
-              
-              Current change: {{ $value | printf "%.2f" }}%
-              Current price: $ {{ with query "bitcoin_current_price_usd" }}{{ . | first | value | printf "%.2f" }}{{ end }}
-
-              Test alert - will be adjusted back to 5% after testing
-
-        # Profit alerts (5% to 100%)
-        - alert: BitcoinProfitTarget
-          expr: |
-            bitcoin_price_change_percent >= 5 * floor(bitcoin_price_change_percent / 5)
-            and
-            bitcoin_price_change_percent > 0
-            and
-            bitcoin_price_change_percent <= 100
-          for: 1m
-          labels:
-            severity: info
-            namespace: monitoring
-          annotations:
-            summary: "🚨 Investment Alert 🚨"
-            description: |
-              🎉 PROFIT ALERT!
-              Your investment has increased by {{ $value | printf "%.2f" }}%!
-              
-              Current profit: {{ $value | printf "%.2f" }}%
-              Next target: {{ ceil ($value / 5) * 5 }}%
-              Current price: $ {{ with query "bitcoin_current_price_usd" }}{{ . | first | value | printf "%.2f" }}{{ end }}
-
-              Sent via Bitcoin Investment Tracker 📈
-
-        # Loss alerts (-5% to -50%)
-        - alert: BitcoinLossAlert
-          expr: |
-            bitcoin_price_change_percent <= 5 * ceil(bitcoin_price_change_percent / 5)
-            and
-            bitcoin_price_change_percent < 0
-            and
-            bitcoin_price_change_percent >= -50
+        - alert: BitcoinPriceDrop3Percent
+          expr: bitcoin_price_change_percent > 0.5
           for: 1m
           labels:
             severity: warning
-            namespace: monitoring
+            receiver: slack-bitcoin
           annotations:
-            summary: "🚨 Investment Alert 🚨"
+            summary: "🔻 Bitcoin price Increase Alert 🔻"
             description: |
-              📉 LOSS ALERT!
-              Your investment has decreased by {{ $value | printf "%.2f" }}%!
-              
-              Current loss: {{ $value | printf "%.2f" }}%
-              Next level: {{ floor ($value / 5) * 5 }}%
-              Current price: $ {{ with query "bitcoin_current_price_usd" }}{{ . | first | value | printf "%.2f" }}{{ end }}
+              🚀 Price increase!
+              The price of Bitcoin has increased by more than 0.5% in the last 1 minute!
+              Current price: R$ {{ $value }}
+              Current profit: {{ with query "bitcoin_investment_profit_percent" }}{{ . | first | value }}%{{ end }}
 
-              Sent via Bitcoin Investment Tracker 📊
-
-        # Special 100% profit alert
-        - alert: BitcoinProfitTarget100Percent
-          expr: bitcoin_price_change_percent >= 100
-          for: 1m
-          labels:
-            severity: info
-            namespace: monitoring
-          annotations:
-            summary: "🚨 Investment Alert 🚨"
-            description: |
-              🎉 100% PROFIT!
-              Congratulations! Your investment has doubled in value!
-              
-              Current profit: {{ $value | printf "%.2f" }}%
-              Current price: $ {{ with query "bitcoin_current_price_usd" }}{{ . | first | value | printf "%.2f" }}{{ end }}
-
-              Sent via Bitcoin Investment Tracker 🚀
-
-        # Special 50% loss alert
-        - alert: BitcoinLossAlert50Percent
-          expr: bitcoin_price_change_percent <= -50
-          for: 1m
-          labels:
-            severity: critical
-            namespace: monitoring
-          annotations:
-            summary: "🚨 Investment Alert 🚨"
-            description: |
-              ⚠️ 50% LOSS!
-              Warning! Your investment has lost half its value!
-              
-              Current loss: {{ $value | printf "%.2f" }}%
-              Current price: $ {{ with query "bitcoin_current_price_usd" }}{{ . | first | value | printf "%.2f" }}{{ end }}
-
-              Sent via Bitcoin Investment Tracker ⚠️
+              Sent via Bitcoin Investment Tracker
