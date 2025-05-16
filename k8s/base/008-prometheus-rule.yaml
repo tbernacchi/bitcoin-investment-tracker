@@ -13,8 +13,7 @@ spec:
       rules:
         # Test alert for small changes
         - alert: BitcoinProfitTarget
-          expr: |
-            bitcoin_price_change_percent >= 0.5  # Temporarily reduced threshold for testing
+          expr: bitcoin_price_change_percent >= 0.5  # Simplified expression for testing
           for: 30s
           labels:
             severity: info
