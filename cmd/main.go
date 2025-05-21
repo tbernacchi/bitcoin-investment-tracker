@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -10,6 +12,24 @@ import (
 	"github.com/tbernacchi/bitcoin-investment-tracker/internal/webserver"
 	"github.com/tbernacchi/bitcoin-investment-tracker/internal/websocket"
 )
+
+// updateMetricsWrapper wraps the metrics.UpdateMetrics function to match the expected interface
+func updateMetricsWrapper(price float64, changePercent float64) {
+	// Get values from environment variables
+	initialInvestment, err := strconv.ParseFloat(os.Getenv("INVESTMENT_BRL"), 64)
+	if err != nil {
+		log.Printf("Error parsing INVESTMENT_BRL: %v, using default 20000", err)
+		initialInvestment = 20000
+	}
+
+	btcAmount, err := strconv.ParseFloat(os.Getenv("BTC_AMOUNT"), 64)
+	if err != nil {
+		log.Printf("Error parsing BTC_AMOUNT: %v, using default 0.1", err)
+		btcAmount = 0.1
+	}
+
+	metrics.UpdateMetrics(price, changePercent, initialInvestment, btcAmount)
+}
 
 func main() {
 	// Load environment variables
@@ -37,7 +57,7 @@ func main() {
 	// Start WebSocket for metrics
 	go websocket.MonitorPrices(
 		binanceWsURL,
-		metrics.UpdateMetrics,
+		updateMetricsWrapper,
 	)
 
 	// Keep the program running
