@@ -27,7 +27,7 @@ func (i *Investment) Calculate() (btcAmount, valueBRL float64) {
 	return btcAmount, valueBRL
 }
 
-func ShowInvestmentInfo(btcPriceBRL float64, usdBrlRate float64) {
+func ShowInvestmentInfo(btcPriceBRL float64, usdBrlRate float64, changePercent float64) {
 	investmentStr := os.Getenv("INVESTMENT_BRL")
 	btcAmountStr := os.Getenv("BTC_AMOUNT")
 	if investmentStr == "" || btcAmountStr == "" {
@@ -51,9 +51,9 @@ func ShowInvestmentInfo(btcPriceBRL float64, usdBrlRate float64) {
 
 	// Update metrics with the calculated values
 	metrics.UpdateMetrics(
-		investment,      // initialInvestment
-		currentValueBRL, // currentValue
-		btcAmount,       // btcAmount
-		btcPriceBRL,     // btcPrice
+		btcPriceBRL,   // price
+		changePercent, // changePercent
+		investment,    // initialInvestment
+		btcAmount,     // btcAmount
 	)
 }
