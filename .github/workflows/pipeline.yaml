@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
     paths-ignore:
-      - "kubernetes/.argocd-source-*.yaml"
+      - "k8s/base/kustomization.yaml"
   pull_request:
     branches: [ "main" ]
 
