@@ -94,19 +94,12 @@ func MonitorPrices(wsURL string, priceCallback func(float64, float64)) {
 				continue
 			}
 
-			// Convert string price to float64
-			price, err := strconv.ParseFloat(ticker.LastPrice, 64)
-			if err != nil {
-				log.Println("Price conversion error:", err)
-				continue
-			}
+			// Parse numeric values
+			price, _ := strconv.ParseFloat(ticker.LastPrice, 64)
+			changePercent, _ := strconv.ParseFloat(ticker.PricePercent, 64)
 
-			// Get 24h price change percentage
-			changePercent, err := strconv.ParseFloat(ticker.PricePercent, 64)
-			if err != nil {
-				log.Println("Change percent conversion error:", err)
-				continue
-			}
+			// Update metrics
+			priceCallback(price, changePercent)
 
 			// Format the log message with price and change percentage
 			var changeSymbol string
@@ -118,8 +111,10 @@ func MonitorPrices(wsURL string, priceCallback func(float64, float64)) {
 				changeSymbol = "="
 			}
 
-			log.Printf("BTC Price: %s (%s%.2f%%)", formatPrice(price), changeSymbol, changePercent)
-			priceCallback(price, changePercent)
+			log.Printf("BTC Price: %s (%s%.2f%%)",
+				formatPrice(price),
+				changeSymbol,
+				changePercent)
 		}
 
 		// Try to reconnect 5 seconds after the connection is lost

@@ -1,4 +1,3 @@
----
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: AlertmanagerConfig
 metadata:
@@ -8,26 +7,31 @@ metadata:
     release: my-kube-prometheus-stack
 spec:
   route:
-    receiver: slack-bitcoin
+    receiver: 'slack-bitcoin'
     matchers:
-      - name: alertname
-        value: BitcoinProfitTarget.*|BitcoinLossAlert.*
-        matchType: "=~"
+      - name: alertname 
+        value: 'BitcoinPriceVariationTest'
+        matchType: "="
     groupBy: ['alertname']
-    groupWait: 30s
-    groupInterval: 15m    # Will check every 15 minutes
-    repeatInterval: 15m   # Will alert again if still at new level
+    groupWait: 0s
+    groupInterval: 1m
+    repeatInterval: 1m
   receivers:
-  - name: slack-bitcoin
-    slackConfigs:
-    - sendResolved: true
-      channel: '#bitcoin-investment-tracker'
-      apiURL:
-        name: slack-token
-        key: url
-      httpConfig:
-        bearerTokenSecret:
-          name: slack-token
-          key: token
-      title: '{{ .CommonAnnotations.summary }}'
-      text: '{{ .CommonAnnotations.description }}'
+    - name: 'slack-bitcoin'
+      slackConfigs:
+        - sendResolved: true
+          channel: '#bitcoin-investment-tracker'
+          apiURL:
+            name: slack-token
+            key: url
+          httpConfig:
+            bearerTokenSecret:
+              name: slack-token
+              key: token
+          text: |
+            💰 *Bitcoin Tracker*
+            📊 *{{ .CommonAnnotations.summary }}*
+            🪙 *BTC Amount:* {{ .CommonLabels.bitcoin_amount_held }}
+            💸 *Price (BRL):* {{ .CommonLabels.bitcoin_current_price_brl }}
+            ⚠️ *Details:* {{ .CommonAnnotations.description }}
+
