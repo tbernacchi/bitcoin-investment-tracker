@@ -15,7 +15,7 @@ env:
 
 jobs:
   test:
-    runs-on: [my-runner-set]
+    runs-on: [my-runner-bitcoin]
 
     steps:
       # Checkout code
