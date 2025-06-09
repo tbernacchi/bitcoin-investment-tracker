@@ -66,112 +66,63 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Bitcoin Tracker</title>
+    <title>Bitcoin Investment Tracker</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            max-width: 600px;
+            font-family: Arial, sans-serif;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f8f9fa;
-            color: #212529;
+            background-color: #f5f5f5;
         }
-        .price-card {
+        .card {
             background: white;
-            border-radius: 12px;
-            padding: 24px;
+            border-radius: 8px;
+            padding: 20px;
             margin: 20px 0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .price {
-            font-size: 48px;
+        .value {
+            font-size: 24px;
             font-weight: bold;
-            margin: 10px 0;
+            color: #333;
         }
-        .change {
-            font-size: 20px;
-            margin: 10px 0;
+        .profit-positive {
+            color: #28a745;
         }
-        .positive { color: #198754; }
-        .negative { color: #dc3545; }
-        .neutral { color: #6c757d; }
-        .small-text {
-            font-size: 14px;
-            color: #6c757d;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+        .profit-negative {
+            color: #dc3545;
         }
         .last-update {
+            color: #666;
             font-size: 12px;
-            color: #6c757d;
+            text-align: right;
         }
     </style>
+    <script>
+        function refreshPage() {
+            location.reload();
+        }
+        setInterval(refreshPage, 10000); // Atualiza a cada 10 segundos
+    </script>
 </head>
 <body>
-    <div class="header">
-        <h1>Bitcoin Tracker</h1>
-        <span class="last-update" id="lastUpdate">{{.LastUpdate}}</span>
-    </div>
-
-    <div class="price-card">
-        <div class="small-text">Bitcoin Price</div>
-        <div class="price" id="btcPrice">{{.CurrentBTCPrice}}</div>
-        <div class="change" id="priceChange">
-            <span id="changeValue"></span>
-        </div>
-    </div>
-
-    <div class="price-card">
-        <div class="small-text">Your Investment</div>
-        <div>Amount: <strong>{{.BTCAmount}} BTC</strong></div>
-        <div>Value: <strong id="currentValue">{{.CurrentValue}}</strong></div>
-        <div class="change" id="profitLoss">
-            <span id="profitValue">{{.Profit}} ({{printf "%.2f" .ProfitPercent}}%)</span>
-        </div>
-    </div>
-
-    <script>
-    const ws = new WebSocket('ws://' + window.location.host + '/ws');
+    <h1>Bitcoin Investment Tracker</h1>
     
-    ws.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        
-        // Update price
-        document.getElementById('btcPrice').textContent = data.price;
-        
-        // Update change
-        const changeElement = document.getElementById('changeValue');
-        const changeClass = data.changePercent > 0 ? 'positive' : (data.changePercent < 0 ? 'negative' : 'neutral');
-        const changeSymbol = data.changePercent > 0 ? '↑' : (data.changePercent < 0 ? '↓' : '=');
-        changeElement.textContent = changeSymbol + ' ' + data.changePercent.toFixed(2) + '%';
-        changeElement.className = changeClass;
-        
-        // Update investment value
-        document.getElementById('currentValue').textContent = data.currentValue;
-        
-        // Update profit/loss
-        const profitElement = document.getElementById('profitValue');
-        profitElement.textContent = data.profit + ' (' + data.profitPercent.toFixed(2) + '%)';
-        profitElement.className = data.profitPercent > 0 ? 'positive' : 'negative';
-        
-        // Update timestamp
-        document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
-    };
-    
-    ws.onclose = function() {
-        console.log('WebSocket connection closed. Reconnecting...');
-        setTimeout(function() {
-            window.location.reload();
-        }, 5000);
-    };
-    </script>
+    <div class="card">
+        <h2>Investment Summary</h2>
+        <p>Initial Investment: <span class="value">{{.Investment}}</span></p>
+        <p>Bitcoin Amount: <span class="value">{{.BTCAmount}}</span> BTC</p>
+        <p>Current BTC Price: <span class="value">{{.CurrentBTCPrice}} ({{formatUSD .CurrentBTCPriceUSD}})</span></p>
+        <p>Current Value: <span class="value">{{.CurrentValue}}</span></p>
+        <p>Profit/Loss: <span class="value {{if gt .ProfitPercent 0.0}}profit-positive{{else}}profit-negative{{end}}">
+            {{.Profit}} ({{printf "%.2f" .ProfitPercent}}%)
+        </span></p>
+    </div>
+
+    <p class="last-update">Last update: {{.LastUpdate}}</p>
 </body>
 </html>
 `
