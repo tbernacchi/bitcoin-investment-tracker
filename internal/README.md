@@ -147,7 +147,8 @@ ArgoCD handles the continuous deployment by:
 
 ### ArgoCD Configuration
 
-The ArgoCD application is defined in:
+The ArgoCD application is defined in [`k8s/argocd/application.yaml`](../../k8s/argocd/application.yaml)
+
 ```
 k8s/argocd/application.yaml
 ```
@@ -195,12 +196,23 @@ The manifest watches the `k8s/base` directory for:
 - ArgoCD Dashboard: Monitor sync status and health
 - Kubernetes: Use `kubectl` to verify pod status
 
-### Rollback Process
+### Rollback Process (To Be Implemented)
 
-In case of deployment issues:
-1. ArgoCD automatically detects health issues
-2. For auto-sync environments: automatic rollback to last known good state
-3. For manual environments: use ArgoCD UI/CLI to rollback
+Future implementation will include automated rollback strategy using:
+- Argo Rollouts for progressive delivery
+- Prometheus metrics for health checks:
+  - Application metrics (error rates, latency)
+  - Business metrics (successful price updates)
+  - Resource utilization
+- Automated rollback triggers based on:
+  - Health check failures
+  - Metric thresholds
+  - Custom business rules
+
+Planned rollback scenarios:
+1. Automatic rollback on health check failures
+2. Progressive rollback with canary deployments
+3. Manual rollback option through ArgoCD UI/CLI
 
 ### Code Structure
 1. Follow the established package structure
