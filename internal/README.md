@@ -147,7 +147,7 @@ ArgoCD handles the continuous deployment by:
 
 ### ArgoCD Configuration
 
-The ArgoCD application is defined in [`k8s/argocd/application.yaml`](../../k8s/argocd/application.yaml)
+The ArgoCD application is defined in [`k8s/argocd/application.yaml`](https://github.com/tbernacchi/bitcoin-investment-tracker/blob/main/k8s/argocd/application.yaml)
 
 ```
 k8s/argocd/application.yaml
