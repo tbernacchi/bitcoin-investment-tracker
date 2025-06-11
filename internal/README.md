@@ -145,6 +145,29 @@ ArgoCD handles the continuous deployment by:
 2. Automatically syncing changes to the cluster
 3. Ensuring the desired state matches the actual state
 
+### ArgoCD Configuration
+
+The ArgoCD application is defined in:
+```
+k8s/argocd/application.yaml
+```
+
+This configuration includes:
+- Application name and namespace
+- Source repository and path
+- Target namespace for deployment
+- Sync policy (automated with pruning and self-healing)
+- Image updater annotations
+- Git credentials configuration
+
+The manifest watches the `k8s/base` directory for:
+- Deployments
+- Services
+- ConfigMaps
+- Secrets
+- ServiceMonitor (for Prometheus)
+- Ingress configurations
+
 #### ArgoCD Applications
 
 - **Development**: Auto-sync enabled, automated pruning and self-healing
